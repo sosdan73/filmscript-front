@@ -2,6 +2,7 @@
 node_modules
 /dist
 /netgrader
+.HEIC
 
 # local env files
 .env
