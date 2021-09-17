@@ -1,23 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="gray lighten-5"
-      dark
-    >
-      <h1>Сценарий съемки</h1>
-      <v-spacer></v-spacer>
-      <v-btn
-        tile
-        color="secondary"
-      >
-        <v-icon left>
-          mdi-cog
-        </v-icon>
-        Настройки
-      </v-btn>
-    </v-app-bar>
-
+    <app-header />
     <v-main>
       <router-view/>
     </v-main>
@@ -25,13 +8,14 @@
 </template>
 
 <script>
+import appHeader from "./components/header/Header.vue"
 
 export default {
   name: 'App',
 
-  data: () => ({
-    //
-  }),
+  components: {
+      appHeader
+  }
 };
 </script>
 

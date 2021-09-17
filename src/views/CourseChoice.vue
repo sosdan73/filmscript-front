@@ -13,14 +13,14 @@
             <div class="d-flex align-center">
                 <v-select
                     :disabled="courseIsSelected"
-                    v-model="selectedCourse"
-                    :items="courses"
+                    v-model="selectedCourseName"
+                    :items="coursesText"
                     label="Выберите курс"
                     single-line
                 ></v-select>
                 <v-btn
                     v-if="!courseIsSelected"
-                    :disabled="!selectedCourse"
+                    :disabled="!selectedCourseName"
                     outlined
                     tile
                     color="primary"
@@ -46,30 +46,33 @@
                 <h2>Выбор занятия:</h2>
                 <div class="d-flex align-center gap-8">
                     <v-select
-                        v-model="selectedLesson"
-                        :items="[1, 2, 3]"
-                        label="Выберите номер занятия"
+                        v-if="classes.length"
+                        v-model="selectedClassName"
+                        :items="classesText"
+                        label="Выберите занятие"
                         single-line
                     ></v-select>
                     <v-btn
-                        :disabled="!selectedLesson"
+                        v-if="classes.length"
+                        :disabled="!selectedClassName"
                         outlined
                         tile
                         color="primary"
-                        @click="redirectMain(0)"
+                        @click="chooseClass"
                         class="ml-8 px-6"
                     >
                         Перейти к занятию
                     </v-btn>
-                    <v-btn
-                        outlined
-                        tile
-                        color="success"
-                        @click="redirectMain(-1)"
-                        class="ml-8 px-6"
+                    <div 
+                        v-if="!classes.length"
                     >
-                        Создать новое занятие
-                    </v-btn>
+                        Занятий не найдено. Создайте свое первое занятие!
+                    </div>
+                    <v-spacer v-if="!classes.length"></v-spacer>
+                    <create-class
+                        @loadingStart="loading = true"
+                        @loadingEnd="loading = false"
+                    />
                 </div>
             </div>
         </div>
@@ -77,46 +80,76 @@
 </template>
 
 <script>
-    import { mapState } from 'vuex';
+    import { mapActions, mapMutations, mapState } from 'vuex';
+    import createClass from "../components/CreateClass.vue";
 
     export default {
+        components: {
+            createClass
+        },
         data() {
             return {
                 loading: true, // Показывать лоадер
-                selectedCourse: '', // Выбранный курс
+                selectedCourseName: '', // Выбранный курс
+                selectedCourseId: '', // ID выбранного курса
                 courseIsSelected: false,
-                selectedLesson: '',
+                selectedClassName: '',
             }
         },
         created() {
             // Получение данных о курсах
-            setTimeout(() => {
-                this.loading = false
-            }, 1000);
+            this.getCourses()
+            .then(() => {
+                this.loading = false;
+            }).catch(err => {
+                console.error(err);
+                this.loading = false;
+            })
         },
         methods: {
+            ...mapActions(['getCourses', 'getClasses']),
+            ...mapMutations(['setActiveCourse', 'setActiveClass']),
             getCourseClasses() {
                 this.loading = true;
                 // Запрос к серверу на наличие занятий в курсе. Если занятия есть, показывать их в селекте и давать кнопку выбора
                 // Если занятий нет, то выводить соответствующее сообщение (с предложением создать шаблон нового занятия)
-                setTimeout(() => {
+                this.getClasses(this.selectedCourseId)
+                .then(() => {
                     this.loading = false;
                     this.courseIsSelected = true;
-                    //
-                }, 1000);
+                    this.setActiveCourse(this.courses.find(course => course.id === this.selectedCourseId));
+                })
+                .catch(err => {
+                    console.error(err);
+                    this.loading = false;
+                })
             },
             deselectCourse() {
                 this.courseIsSelected = false;
-                this.selectedLesson = ''
+                this.selectedClassName = '';
+                this.setActiveCourse(undefined)
             },
-            redirectMain(id) {
-                this.$router.push(`class-data/${id}`)
+            chooseClass() {
+                let number = this.selectedClassName.split(":")[0];
+                this.setActiveClass(this.classes.find(cl => cl.number === Number(number)));
+                this.$router.push(`class-data/${this.activeClass.id}`)
             }
         },
         computed: {
             ...mapState({
-                courses: state => state.courses.map(course => `${course.name}, ${course.teacher}`)
+                coursesText: state => state.courses.map(course => `${course.name}, ${course.teacher}`),
+                courses: state => state.courses,
+                classesText: state => state.classes.length ? state.classes.map(cl => `${cl.number}: ${cl.name}`) : [],
+                classes: state => state.classes,
+                activeCourse: state => state.activeCourse,
+                activeClass: state => state.activeClass,
             })
+        },
+        watch: {
+            selectedCourseName(text) {
+                let index = this.coursesText.indexOf(text);
+                this.selectedCourseId = index === -1 ? '' : this.courses[index].id;
+            },
         }
     }
 </script>
