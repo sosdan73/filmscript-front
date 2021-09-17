@@ -217,7 +217,14 @@
         onFileChanged(e) {
             let selectedFile = e.target.files[0];
             selectedFile.text().then(data => {
-                this.setPresentation(JSON.parse(data))
+                this.activeClass.presentation = [];
+                let rows = JSON.parse(data);
+                if (rows && rows.length) {
+                    console.log('works');
+                    rows.forEach(item => {
+                        this.activeClass.presentation.push(item)
+                    })
+                }
             })
         }
     },
