@@ -148,7 +148,7 @@ export default new Vuex.Store({
     async getClasses(s, id) {
         const state = s.state;
         axios.post(
-            process.env.VUE_APP_LINK+'/get-classes', {
+            '134.0.119.39:8081/get-classes', {
             courseId: id
         })
         .then(data => {
@@ -176,7 +176,7 @@ export default new Vuex.Store({
     },
     async postClass(s, newClass) {
         const state = s.state;
-        axios.post(process.env.VUE_APP_LINK+'/create-class', {
+        axios.post('134.0.119.39:8081/create-class', {
             courseId: state.activeCourse.id,
             number: newClass.number,
             name: newClass.name
@@ -188,7 +188,7 @@ export default new Vuex.Store({
     async updateClass(s) {
         const state = s.state;
         axios.post(
-            process.env.VUE_APP_LINK+'/update-presentation',
+            '134.0.119.39:8081/update-presentation',
             {
                 id: state.activeClass.id,
                 presentation: state.activeClass.presentation
@@ -201,7 +201,7 @@ export default new Vuex.Store({
     // Courses
     async getCourses(s) {
         const state = s.state;
-        axios.get(process.env.VUE_APP_LINK+'/get-courses')
+        axios.get('134.0.119.39:8081/get-courses')
         .then(data => {
             if (data.data.length) {
                 state.courses = [];
@@ -219,7 +219,7 @@ export default new Vuex.Store({
     },
     async createCourse(s, payload) {
         const state = s.state;
-        axios.post(process.env.VUE_APP_LINK+'/post-course', {
+        axios.post('134.0.119.39:8081/post-course', {
             name: payload.name,
             teacher: payload.teacher
         })
@@ -231,7 +231,7 @@ export default new Vuex.Store({
     async getMqtt(s) {
         const state = s.state;
         // Получение данных MQTT, затем присваивание их в стейт
-        axios.get(process.env.VUE_APP_LINK+'/get-mqtt')
+        axios.get('134.0.119.39:8081/get-mqtt')
         .then(data => {
             state.mqtt = {
                 server: data.data[0].server,
@@ -248,7 +248,7 @@ export default new Vuex.Store({
     async saveMqtt(s) {
         const state = s.state;
         const mqtt = state.mqtt;
-        axios.post(process.env.VUE_APP_LINK+'/put-mqtt', {
+        axios.post('134.0.119.39:8081/put-mqtt', {
             server: mqtt.server,
             user: mqtt.user,
             password: mqtt.password,
@@ -266,7 +266,7 @@ export default new Vuex.Store({
     // OBS
     async connectOBS(s) {
         const state = s.state;
-        axios.post(process.env.VUE_APP_LINK+'/connect-obs', {
+        axios.post('134.0.119.39:8081/connect-obs', {
             address: state.connectionData.ip,
             port: state.connectionData.port,
             password: state.connectionData.password
@@ -281,7 +281,7 @@ export default new Vuex.Store({
 
     async disconnectOBS(s) {
         const state = s.state;
-        axios.post(process.env.VUE_APP_LINK+'/disconnect-obs')
+        axios.post('134.0.119.39:8081/disconnect-obs')
         .then(data => {
             console.log(data);
             state.connection.text = 'Cоединение разорвано';
@@ -296,7 +296,7 @@ export default new Vuex.Store({
     // vMix
     async connectVMix(s) {
         const state = s.state;
-        axios.post(process.env.VUE_APP_LINK+'/connect-vmix', {
+        axios.post('134.0.119.39:8081/connect-vmix', {
             address: state.connectionData.ip,
         })
         .then(data => {
