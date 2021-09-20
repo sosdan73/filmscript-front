@@ -22,13 +22,17 @@
                 ></v-text-field>
             </template>
             <template v-slot:item.source="{ item }">
-                <v-text-field
+                <!-- <v-text-field
                     v-model="item[isVMix ? 'source' : 'scene']"
-                ></v-text-field>
+                ></v-text-field> -->
+                <v-select
+                    :items="isVMix ? sources : scenes"
+                    v-model="item[isVMix ? 'source' : scene]"
+                ></v-select>
             </template>
             <template v-slot:item.transition="{ item }">
                 <v-select
-                    :items="transitions[isVMix ? 'vmix' : 'obs']"
+                    :items="isVMix ? vmixTransitions : obsTransitions"
                     v-model="item.transition"
                 ></v-select>
             </template>
@@ -233,8 +237,10 @@
         isOBS: state => state.mixingDesk.isOBS,
         isVMix: state => state.mixingDesk.isVMix,
         presentationTables: state => state.presentationTables,
-        backend: state => state.backend,
-        transitions: state => state.transitions,
+        obsTransitions: state => state.transitions.obs.map(trans => trans.name),
+        vmixTransitions: state => state.transitions.vmix.map(trans => trans.name),
+        scenes: state => state.sources.obs.map(source => source.name),
+        sources: state => state.sources.vmix.map(source => source.name),
         activeClass: state => state.activeClass,
       }),
       headers() {
@@ -322,7 +328,7 @@
       },
       pageWidth() {
         return document.getElementsByClassName('container')[0].offsetWidth
-      }
+      },
     },
   }
 </script>

@@ -51,17 +51,10 @@ export default {
     methods: {
         ...mapActions(['connectOBS', 'disconnectOBS', 'connectVMix']),
         connect() {
-            this.connection.loading = true;
             if (this.isOBS) {
                 this.connectOBS()
-                .finally(() => {
-                    this.connection.loading = false
-                })
             } else {
                 this.connectVMix()
-                .finally(() => {
-                    this.connection.loading = false
-                })
             }
         },
         disconnect() {

@@ -1,6 +1,10 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+import { obs } from '../main'
+
+// import OBSWebSocket from 'obs-websocket-js';
+// const obs = new OBSWebSocket();
 
 Vue.use(Vuex)
 
@@ -34,49 +38,12 @@ export default new Vuex.Store({
         sslPort: undefined,
         websocketsPort: undefined,
     },
-    backend: {
-    //   sourcesOBS: [
-    //     '57 front',
-    //     'Евсютин',
-    //     'King 77'
-    //   ],
-    //   sourcesVMix: [
-    //     'NDI TEACHER (Intel(R) UHD Graphics 1)',
-    //     'VLC rtsp://172.18.191.57:554/stream/main',
-    //     'Colour',
-    //   ],
-      transitionsOBS: [
-        'trans1',
-        'trans2',
-        'trans3'
-      ],
-      transitionsVMix: [
-        'Cut',
-        'Fade',
-        'Zoom',
-        'Slide',
-        'Fly',
-        'CrossZoom',
-        'FlyRotate',
-        'Cube',
-        'CubeZoom',
-        'VerticalWipe',
-        'VerticalSlide',
-        'Merge',
-        'WipeReverse',
-        'SlideReverse',
-        'VerticalWipeReverse',
-        'VerticalSlideReverse',
-        'Stinger1',
-        'Stinger2',
-      ]
+    sources: {
+        obs: [],
+        vmix: []
     },
     transitions: {
-        obs: [
-        'trans1',
-        'trans2',
-        'trans3'
-        ],
+        obs: [],
         vmix: [
         'Cut',
         'Fade',
@@ -266,31 +233,47 @@ export default new Vuex.Store({
     // OBS
     async connectOBS(s) {
         const state = s.state;
-        axios.post(process.env.VUE_APP_LINK+'/connect-obs', {
-            address: state.connectionData.ip,
-            port: state.connectionData.port,
+        state.connection.loading = true;
+        obs.connect({
+            address: `${state.connectionData.ip}:${state.connectionData.port}`,
             password: state.connectionData.password
         })
+        .then(() => {
+            return obs.send('GetSceneList')
+        })
         .then(data => {
-            console.log(data);
-            state.connection.text = 'Cоединение установлено'
+            state.sources.obs = [];
+            data.scenes.forEach(scene => {
+                state.sources.obs.push(scene)
+            })
+            return obs.send('GetTransitionList')
+        })
+        .then(data => {
+            state.connection.status = true;
+            state.connection.text = 'Cоединение установлено';
+            state.connection.alertColor = 'success';
+
+            state.transitions.obs = [];
+            data.transitions.forEach(transition => {
+                state.transitions.obs.push(transition)
+            })
         }).catch(err => {
             console.error(err)
+        })
+        .finally(() => {
+            state.connection.loading = false;
         })
     },
 
     async disconnectOBS(s) {
         const state = s.state;
-        axios.post(process.env.VUE_APP_LINK+'/disconnect-obs')
-        .then(data => {
-            console.log(data);
-            state.connection.text = 'Cоединение разорвано';
-            setTimeout(() => {
-                state.connection.text = ''
-            }, 3000);
-        }).catch(err => {
-            console.error(err)
-        })
+        obs.disconnect();
+        state.connection.status = false;
+        state.connection.text = 'Cоединение разорвано';
+        setTimeout(() => {
+            state.connection.text = ''
+        }, 3000)
+        state.connection.alertColor = 'warning';
     },
 
     // vMix
