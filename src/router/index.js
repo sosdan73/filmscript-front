@@ -5,20 +5,9 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/class-data/:id',
+    path: '/',
     name: 'Main',
     component: () => import('../views/Main.vue')
-  },
-  {
-    path: '/admin',
-    name: 'admin',
-    component: () => import('../views/Admin.vue')
-  },
-  {
-    path: '/',
-    alias: '*',
-    name: 'CourseChoice',
-    component: () => import('../views/CourseChoice.vue')
   },
 ]
 

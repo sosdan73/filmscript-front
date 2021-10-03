@@ -10,6 +10,7 @@
           <v-text-field
             :disabled="disabled"
             v-model="connectionData.ip"
+            @keydown.enter="connect"
             :rules="ipRules"
             label="IP-адрес микшера"
             required
@@ -23,6 +24,7 @@
           <v-text-field
             :disabled="disabled"
             v-model="connectionData.port"
+            @keydown.enter="connect"
             :counter="4"
             label="Номер порта"
           ></v-text-field>
@@ -36,6 +38,7 @@
             :disabled="disabled"
             type="password"
             v-model="connectionData.password"
+            @keydown.enter="connect"
             label="Пароль"
           ></v-text-field>
         </v-col>
@@ -45,7 +48,7 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex';
+  import { mapActions, mapState } from 'vuex';
   import { eventBus } from '../../main';
   import inputIp from '../inputIP.vue';
 
@@ -63,9 +66,12 @@
       }
     },
     methods: {
-      connect() {
-        console.log('заглушка');
-      }
+        ...mapActions(['connectOBS']),
+        connect() {
+            if (this.isValid) {
+                this.connectOBS()
+            }
+        }
     },
     computed: {
       ...mapState({

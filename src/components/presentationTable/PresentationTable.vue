@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-7">
+    <div class="mt-7" >
         <v-data-table
             :headers="headers"
             :items="loading ? [] : data"
@@ -22,12 +22,9 @@
                 ></v-text-field>
             </template>
             <template v-slot:item.source="{ item }">
-                <!-- <v-text-field
-                    v-model="item[isVMix ? 'source' : 'scene']"
-                ></v-text-field> -->
                 <v-select
                     :items="isVMix ? sources : scenes"
-                    v-model="item[isVMix ? 'source' : scene]"
+                    v-model="item[isVMix ? 'source' : 'scene']"
                 ></v-select>
             </template>
             <template v-slot:item.transition="{ item }">
@@ -71,7 +68,10 @@
             <template v-slot:item.promptText="{ item }">
                 <v-textarea
                     rows="1"
+                    auto-grow
                     v-model="item.promptText"
+                    class="justify"
+                    style="text-align:justify;"
                 ></v-textarea>
             </template>
             <template v-slot:item.delete="{ item }">
@@ -162,7 +162,7 @@
                 color="success"
                 :elevation="0"
                 :loading="loading"
-                @click="saveTable"
+                @click="postTable"
             >
                 Сохранить
             </v-btn>
@@ -172,12 +172,8 @@
 
 <script>
   import { mapState, mapMutations, mapActions } from 'vuex';
-  import Row from './Row.vue';
 
   export default {
-    components: {
-      row: Row,
-    },
     data() {
       return {
         loading: false,
@@ -186,7 +182,7 @@
     },
     methods: {
         ...mapMutations(['addRow', 'deleteRow', 'setPresentation']),
-        ...mapActions(['updateClass']),
+        ...mapActions(['postTable']),
         selectRow(item) {
             if (item.checked) {
                 this.selectedItems.push(item)
@@ -205,7 +201,24 @@
             this.$refs.uploader.click();
         },
         exportTable() {
-            let blob = new Blob([JSON.stringify(this.activeClass.presentation)], {type: 'json'});
+            let presentation;
+            if (this.activeClass.presentation.length) {
+                presentation = [];
+                this.activeClass.presentation.forEach(row => {
+                    presentation.push({
+                        slideNumber: row.slideNumber,
+                        source: row.source,
+                        scene: row.scene,
+                        overlay1: row.overlay1,
+                        overlay2: row.overlay2,
+                        overlay3: row.overlay3,
+                        overlay4: row.overlay4,
+                        promptText: row.promptText,
+                        transition: row.transition
+                    })
+                })
+            }
+            let blob = new Blob([JSON.stringify(presentation)], {type: 'json'});
             let link = document.createElement('a');
             link.setAttribute("href", URL.createObjectURL(blob));
             link.setAttribute("download", "table-data.json")
@@ -224,8 +237,8 @@
                 this.activeClass.presentation = [];
                 let rows = JSON.parse(data);
                 if (rows && rows.length) {
-                    console.log('works');
                     rows.forEach(item => {
+                        item.checked = false;
                         this.activeClass.presentation.push(item)
                     })
                 }
@@ -357,7 +370,7 @@
     border: 1px solid black;
     width: 200px;
   }
-  .table {
+.table {
     overflow-x: auto;
-  }
+}
 </style>

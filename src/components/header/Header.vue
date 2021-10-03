@@ -19,7 +19,7 @@ import { mapActions } from 'vuex';
             mqtt
         },
         created() {
-            this.getMqtt();
+            // this.getMqtt();
         },
         methods: {
             ...mapActions(["getMqtt"]),

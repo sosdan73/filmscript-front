@@ -30,7 +30,13 @@
             >
                 <v-text-field
                     v-model="mqtt.server"
-                    label="Сервер"
+                    label="IP-адрес сервера"
+                ></v-text-field>
+
+                <v-text-field
+                    v-model="mqtt.port"
+                    label="Порт"
+                    required
                 ></v-text-field>
 
                 <v-text-field
@@ -42,24 +48,6 @@
                 <v-text-field
                     v-model="mqtt.password"
                     label="Пароль"
-                    required
-                ></v-text-field>
-
-                <v-text-field
-                    v-model="mqtt.port"
-                    label="Порт"
-                    required
-                ></v-text-field>
-
-                <v-text-field
-                    v-model="mqtt.sslPort"
-                    label="SSL-порт"
-                    required
-                ></v-text-field>
-
-                <v-text-field
-                    v-model="mqtt.websocketsPort"
-                    label="Websocket-порт"
                     required
                 ></v-text-field>
             </v-form>

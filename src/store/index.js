@@ -3,21 +3,24 @@ import Vuex from 'vuex'
 import axios from 'axios'
 import { obs } from '../main'
 
-// import OBSWebSocket from 'obs-websocket-js';
-// const obs = new OBSWebSocket();
-
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    snackbar: {
+        show: false,
+        text: '',
+        color: '',
+        time: 3000,
+    },
     mixingDesk: {
-      isOBS: false,
-      isVMix: false
+        isOBS: true,
+        isVMix: false
     },
     presentationTables: [],
     connectionData: {
-      ip: '',
-      port: '',
+      ip: '127.0.0.1',
+      port: '4444',
       password: ''
     },
     connection: {
@@ -26,49 +29,30 @@ export default new Vuex.Store({
       text: '',
       alertColor: '',
     },
-    courses: [],
-    classes: [],
-    activeCourse: undefined,
-    activeClass: undefined,
+    activeClass: {
+        presentation: []
+    },
     mqtt: {
         server: '',
         user: '',
         password: '',
         port: undefined,
-        sslPort: undefined,
-        websocketsPort: undefined,
     },
     sources: {
         obs: [],
-        vmix: []
     },
     transitions: {
-        obs: [],
-        vmix: [
-        'Cut',
-        'Fade',
-        'Zoom',
-        'Slide',
-        'Fly',
-        'CrossZoom',
-        'FlyRotate',
-        'Cube',
-        'CubeZoom',
-        'VerticalWipe',
-        'VerticalSlide',
-        'Merge',
-        'WipeReverse',
-        'SlideReverse',
-        'VerticalWipeReverse',
-        'VerticalSlideReverse',
-        'Stinger1',
-        'Stinger2',
-        ]
+        obs: []
     }
   },
 
 
   mutations: {
+    showSnackbar(state, payload) {
+        state.snackbar.show = true;
+        state.snackbar.text = payload.text;
+        state.snackbar.color = payload.color
+    },
     setMixingDesk(state, payload) {
         state.mixingDesk.isOBS = payload === 'obs';
         state.mixingDesk.isVMix = payload !== 'obs'
@@ -111,89 +95,6 @@ export default new Vuex.Store({
 
 
   actions: {
-    // Classes
-    async getClasses(s, id) {
-        const state = s.state;
-        axios.post(
-            process.env.VUE_APP_LINK+'/get-classes', {
-            courseId: id
-        })
-        .then(data => {
-            state.classes = [];
-            if (data.data && data.data.length) {
-                data.data.forEach(cl => {
-                    if (cl.presentation.length > 0) {
-                        cl.presentation.forEach(row => {
-                            row.checked = false;
-                        })
-                    }
-                    state.classes.push({
-                        courseId: cl.courseId,
-                        id: cl._id,
-                        number: cl.number,
-                        name: cl.name,
-                        presentation: cl.presentation
-                    })
-                })
-            }
-        })
-        .catch(err => {
-            console.error(err);
-        })
-    },
-    async postClass(s, newClass) {
-        const state = s.state;
-        axios.post(process.env.VUE_APP_LINK+'/create-class', {
-            courseId: state.activeCourse.id,
-            number: newClass.number,
-            name: newClass.name
-        })
-        .catch(err => {
-            console.error(err);
-        })
-    },
-    async updateClass(s) {
-        const state = s.state;
-        axios.post(
-            process.env.VUE_APP_LINK+'/update-presentation',
-            {
-                id: state.activeClass.id,
-                presentation: state.activeClass.presentation
-            }
-        )
-        .catch(err => {
-            console.error(err);
-        })
-    },
-    // Courses
-    async getCourses(s) {
-        const state = s.state;
-        axios.get(process.env.VUE_APP_LINK+'/get-courses')
-        .then(data => {
-            if (data.data.length) {
-                state.courses = [];
-                data.data.forEach(course => {
-                    state.courses.push({
-                        id: course._id,
-                        name: course.name,
-                        teacher: course.teacher
-                    })
-                })
-            }
-        }).catch(err => {
-            console.error(err)
-        })
-    },
-    async createCourse(s, payload) {
-        const state = s.state;
-        axios.post(process.env.VUE_APP_LINK+'/post-course', {
-            name: payload.name,
-            teacher: payload.teacher
-        })
-        .catch(err => {
-            console.error(err)
-        })
-    },
     // MQTT
     async getMqtt(s) {
         const state = s.state;
@@ -215,13 +116,11 @@ export default new Vuex.Store({
     async saveMqtt(s) {
         const state = s.state;
         const mqtt = state.mqtt;
-        axios.post(process.env.VUE_APP_LINK+'/put-mqtt', {
+        axios.post(process.env.VUE_APP_SAVE_MQTT, {
             server: mqtt.server,
             user: mqtt.user,
             password: mqtt.password,
-            port: Number(mqtt.port),
-            sslPort: Number(mqtt.sslPort),
-            websocketsPort: Number(mqtt.websocketsPort)
+            port: Number(mqtt.port)
         })
         .then(data => {
             console.log(data);
@@ -242,6 +141,7 @@ export default new Vuex.Store({
             return obs.send('GetSceneList')
         })
         .then(data => {
+            console.log(data);
             state.sources.obs = [];
             data.scenes.forEach(scene => {
                 state.sources.obs.push(scene)
@@ -257,11 +157,41 @@ export default new Vuex.Store({
             data.transitions.forEach(transition => {
                 state.transitions.obs.push(transition)
             })
+
+            obs.on('ScenesChanged', () => {
+                s.dispatch('getScenesOBS')
+            });
         }).catch(err => {
-            console.error(err)
+            console.error(err);
+            s.commit('showSnackbar', {
+                text: 'Ошибка подключения',
+                color: 'error'
+            });
         })
         .finally(() => {
             state.connection.loading = false;
+        })
+    },
+
+    async getScenesOBS(s) {
+        const state = s.state;
+        obs.send('GetSceneList')
+        .then(data => {
+            state.sources.obs = [];
+            data.scenes.forEach(scene => {
+                state.sources.obs.push(scene)
+            })
+            s.commit('showSnackbar', {
+                text: 'Сцены OBS изменены',
+                color: 'warning'
+            });
+        })
+        .catch(err => {
+            console.error(err);
+            s.commit('showSnackbar', {
+                text: 'Ошибка подключения',
+                color: 'error'
+            });
         })
     },
 
@@ -276,17 +206,30 @@ export default new Vuex.Store({
         state.connection.alertColor = 'warning';
     },
 
-    // vMix
-    async connectVMix(s) {
+    // Table communication
+    async postTable(s) {
         const state = s.state;
-        axios.post(process.env.VUE_APP_LINK+'/connect-vmix', {
-            address: state.connectionData.ip,
-        })
-        .then(data => {
-            console.log(data);
-        }).catch(err => {
-            console.error(err)
-        })
+        const table = [];
+        if (state.activeClass.presentation.length) {
+            state.activeClass.presentation.forEach(item => {
+                table.push([
+                    String(item.slideNumber),
+                    state.mixingDesk.isOBS ? item.scene : item.source,
+                    item.transition,
+                    item.overlay1,
+                    item.overlay2,
+                    item.overlay3,
+                    item.overlay4,
+                    null,
+                    null,
+                    item.promptText
+                ]);
+            })
+        }
+        // axios.post(process.env.VUE_APP_POST_TABLE, {
+        //     table
+        // })
+        console.log(table);
     },
   },
 })
