@@ -210,12 +210,16 @@ export default new Vuex.Store({
     async postTable(s) {
         const state = s.state;
         const table = [];
+        const transition = {
+            'Обрезка': 'Cut',
+            'Затухание': 'Fade'
+        }
         if (state.activeClass.presentation.length) {
             state.activeClass.presentation.forEach(item => {
                 table.push([
                     String(item.slideNumber),
                     state.mixingDesk.isOBS ? item.scene : item.source,
-                    item.transition,
+                    item.transition.length && !item.transition[0].match(/[a-z]/i) ? transition[item.transition] : item.transition.name,
                     item.overlay1,
                     item.overlay2,
                     item.overlay3,
@@ -226,6 +230,7 @@ export default new Vuex.Store({
                 ]);
             })
         }
+        console.log(table);
         axios.post(process.env.VUE_APP_POST_TABLE, {
             table
         })
