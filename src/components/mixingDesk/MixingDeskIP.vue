@@ -58,7 +58,7 @@
     },
     data() {
       return {
-        valid: false,
+        valid: true,
         ipRules: [
           v => this.ipFormatCheck || 'Неверный формат. Пример: 192.168.0.1',
           v => this.octetFormatCheck || 'Числа должны быть в диапазоне от 0 до 256',
