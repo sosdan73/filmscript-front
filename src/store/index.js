@@ -226,10 +226,9 @@ export default new Vuex.Store({
                 ]);
             })
         }
-        // axios.post(process.env.VUE_APP_POST_TABLE, {
-        //     table
-        // })
-        console.log(table);
+        axios.post(process.env.VUE_APP_POST_TABLE, {
+            table
+        })
     },
   },
 })

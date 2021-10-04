@@ -104,7 +104,7 @@
       },
       isValid() {
         if (this.mixerIsOBS) {
-          return this.ipIsValid && this.portIsValid && this.connectionData.password
+          return this.ipIsValid && this.portIsValid
         } else if (this.mixerIsVMix) {
           return this.ipIsValid
         }
