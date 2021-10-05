@@ -122,10 +122,17 @@ export default new Vuex.Store({
             password: mqtt.password,
             port: Number(mqtt.port)
         })
-        .then(data => {
-            console.log(data);
-        }).catch(err => {
-            console.error(err)
+        .then(() => {
+            s.commit('showSnackbar', {
+                text: 'Данные сохранены',
+                color: 'success'
+            });
+        })
+        .catch(err => {
+            s.commit('showSnackbar', {
+                text: 'Ошибка подключения',
+                color: 'error'
+            });
         })
     },
 
@@ -233,6 +240,18 @@ export default new Vuex.Store({
         }
         console.log(table);
         axios.post(process.env.VUE_APP_POST_TABLE, table)
+        .then(() => {
+            s.commit('showSnackbar', {
+                text: 'Данные сохранены',
+                color: 'success'
+            });
+        })
+        .catch(() => {
+            s.commit('showSnackbar', {
+                text: 'Ошибка подключения',
+                color: 'error'
+            });
+        })
     },
   },
 })
