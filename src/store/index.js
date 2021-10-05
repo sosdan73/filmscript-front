@@ -214,6 +214,7 @@ export default new Vuex.Store({
             'Обрезка': 'Cut',
             'Затухание': 'Fade'
         }
+        table.push([]);
         if (state.activeClass.presentation.length) {
             state.activeClass.presentation.forEach(item => {
                 table.push([
