@@ -232,9 +232,7 @@ export default new Vuex.Store({
             })
         }
         console.log(table);
-        axios.post(process.env.VUE_APP_POST_TABLE, {
-            table
-        })
+        axios.post(process.env.VUE_APP_POST_TABLE, table)
     },
   },
 })
