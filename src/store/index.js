@@ -301,6 +301,10 @@ export default new Vuex.Store({
     // Table communication
     async getTable(s) {
         const state = s.state;
+        const transition = {
+            'Cut': 'Обрезка',
+            'Fade': 'Затухание'
+        }
         axios.get(process.env.VUE_APP_GET_TABLE)
         .then(data => {
             if (data && data.length) {
@@ -312,7 +316,7 @@ export default new Vuex.Store({
                             slideNumber: Number(item[0]),
                             scene: item[1],
                             source: '',
-                            transition: item[2],
+                            transition: item[2].length && item[2].match(/[a-z]/i) ? transition[item[2]] : item[2],
                             overlay1: item[3],
                             overlay2: item[4],
                             overlay3: item[5],

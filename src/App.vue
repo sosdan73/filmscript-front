@@ -24,20 +24,26 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 import appHeader from "./components/header/Header.vue"
 
 export default {
   name: 'App',
 
-  components: {
-      appHeader
-  },
-  computed: {
-      ...mapState({
-          snackbar: state => state.snackbar
-      })
-  }
+    components: {
+        appHeader
+    },
+    created() {
+        this.getConnectionData()
+    },
+    methods: {
+        ...mapActions(['getConnectionData'])
+    },
+    computed: {
+        ...mapState({
+            snackbar: state => state.snackbar
+        })
+    }
 };
 </script>
 
