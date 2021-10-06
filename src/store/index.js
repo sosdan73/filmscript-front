@@ -146,9 +146,9 @@ export default new Vuex.Store({
             console.log(data);
             if (data) {
                 state.connectionData = {
-                    ip: data.address,
-                    port: data.port,
-                    password: data.password ? data.password : ''
+                    ip: data.data.address,
+                    port: data.data.port,
+                    password: data.data.password ? data.password : ''
                 };
                 s.dispatch('connectOBS');
             }
