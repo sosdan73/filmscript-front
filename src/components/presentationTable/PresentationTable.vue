@@ -180,9 +180,12 @@
         selectedItems: []
       }
     },
+    created() {
+        this.getConnectionData()
+    },
     methods: {
         ...mapMutations(['addRow', 'deleteRow', 'setPresentation']),
-        ...mapActions(['postTable']),
+        ...mapActions(['postTable', 'getConnectionData']),
         selectRow(item) {
             if (item.checked) {
                 this.selectedItems.push(item)

@@ -49,10 +49,11 @@ export default {
         })
     },
     methods: {
-        ...mapActions(['connectOBS', 'disconnectOBS', 'connectVMix']),
+        ...mapActions(['connectOBS', 'disconnectOBS', 'connectVMix', 'postConnectionData']),
         connect() {
             if (this.isOBS) {
-                this.connectOBS()
+                this.connectOBS();
+                this.postConnectionData()
             } else {
                 this.connectVMix()
             }

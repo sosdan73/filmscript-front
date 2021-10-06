@@ -136,6 +136,49 @@ export default new Vuex.Store({
         })
     },
 
+    // Connection data
+    async getConnectionData(s) {
+        const state = s.state;
+        state.connection.loading = true;
+        axios.get(process.env.VUE_APP_GET_OBS_DATA)
+        .then(data => {
+            console.log('connection data here');
+            console.log(data);
+            if (data) {
+                state.connectionData = {
+                    ip: data.address.split(':')[0],
+                    port: data.address.split(':')[1],
+                    password: data.password ? data.password : ''
+                };
+                s.dispatch('connectOBS');
+            }
+        })
+        .catch(err => {
+            console.log(err);
+        })
+        .finally(() => {
+            state.connection.loading = false;
+        })
+    },
+
+    async postConnectionData(s) {
+        const state = s.state;
+        state.connection.loading = true;
+        axios.post(process.env.VUE_APP_POST_OBS_DATA, {
+            address: `${state.connectionData.ip}:${state.connectionData.port}`,
+            password: state.connectionData.password
+        })
+        .then(data => {
+            console.log(data);
+        })
+        .catch(err => {
+            console.log(err);
+        })
+        .finally(() => {
+            state.connection.loading = false;
+        })
+    },
+
     // OBS
     async connectOBS(s) {
         const state = s.state;
@@ -168,6 +211,8 @@ export default new Vuex.Store({
             obs.on('ScenesChanged', () => {
                 s.dispatch('getScenesOBS')
             });
+        }).then(() => {
+            s.dispatch('getTable')
         }).catch(err => {
             console.error(err);
             s.commit('showSnackbar', {
@@ -251,6 +296,36 @@ export default new Vuex.Store({
                 text: 'Ошибка подключения',
                 color: 'error'
             });
+        })
+    },
+    // Table communication
+    async getTable(s) {
+        const state = s.state;
+        axios.get(process.env.VUE_APP_GET_TABLE)
+        .then(data => {
+            if (data && data.length) {
+                state.activeClass.presentation = []
+                data.forEach((item, index) => {
+                    if (index > 0) {
+                        const row = {
+                            checked: false,
+                            slideNumber: Number(item[0]),
+                            scene: item[1],
+                            source: '',
+                            transition: item[2],
+                            overlay1: item[3],
+                            overlay2: item[4],
+                            overlay3: item[5],
+                            overlay4: item[6],
+                            promptText: item[9]
+                        };
+                        state.activeClass.presentation.push(row)
+                    }
+                })
+            }
+        })
+        .catch(err => {
+            console.log(err);
         })
     },
   },
