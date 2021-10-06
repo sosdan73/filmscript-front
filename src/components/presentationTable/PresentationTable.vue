@@ -263,28 +263,28 @@
             align: 'center',
             sortable: false,
             value: 'checked',
-            width: '40px'
+            width: '6.5%'
           },
           {
             text: 'Слайд',
             align: 'center',
             sortable: false,
             value: 'slideNumber',
-            width: '60px'
+            width: '10%'
           },
           {
             text: 'Источник',
             align: 'center',
             sortable: false,
             value: 'source',
-            width: '120px'
+            width: '16%'
           },
           {
             text: 'Переход',
             align: 'center',
             sortable: false,
             value: 'transition',
-            width: '140px'
+            width: '16%'
           },
           {
             text: 'Оверлей 1',
@@ -319,14 +319,14 @@
             align: 'center',
             sortable: false,
             value: 'promptText',
-            width: '200px'
+            width: '45%'
           },
           {
             text: '',
             align: 'center',
             sortable: false,
             value: 'delete',
-            width: '40px'
+            width: '6.5%'
           },
         ]
         if (this.isOBS) {
