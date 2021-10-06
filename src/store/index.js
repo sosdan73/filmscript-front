@@ -146,8 +146,8 @@ export default new Vuex.Store({
             console.log(data);
             if (data) {
                 state.connectionData = {
-                    ip: data.address.split(':')[0],
-                    port: data.address.split(':')[1],
+                    ip: data.address,
+                    port: data.port,
                     password: data.password ? data.password : ''
                 };
                 s.dispatch('connectOBS');
@@ -165,7 +165,8 @@ export default new Vuex.Store({
         const state = s.state;
         state.connection.loading = true;
         axios.post(process.env.VUE_APP_POST_OBS_DATA, {
-            address: `${state.connectionData.ip}:${state.connectionData.port}`,
+            address: state.connectionData.ip,
+            port: state.connectionData.port,
             password: state.connectionData.password
         })
         .then(data => {
