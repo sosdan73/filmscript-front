@@ -61,7 +61,8 @@ export default new Vuex.Store({
         const row = {
             checked: false,
             source: '',
-            scene: '',
+            scene: state.sources.obs[0].name,
+            transition: state.activeClass.presentation.length > 0 ? state.activeClass.presentation[0].transition : state.transitions.obs[0].name,
             overlay1: '',
             overlay2: '',
             overlay3: '',
@@ -69,7 +70,6 @@ export default new Vuex.Store({
             promptText: ''
         };
         row.slideNumber = state.activeClass.presentation.length === 0 ? 1 : Math.max(...state.activeClass.presentation.map(row => row.slideNumber)) + 1;
-        row.transition = state.transitions[state.mixingDesk.isOBS ? 'obs' : 'vmix'][0];
         state.activeClass.presentation.push(row)
     },
     deleteRow(state, payload) {
