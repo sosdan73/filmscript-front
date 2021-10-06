@@ -144,7 +144,7 @@ export default new Vuex.Store({
         .then(data => {
             console.log('connection data here');
             console.log(data);
-            if (data) {
+            if (data && data.data.address) {
                 state.connectionData = {
                     ip: data.data.address,
                     port: data.data.port,
