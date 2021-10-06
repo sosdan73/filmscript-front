@@ -308,7 +308,8 @@ export default new Vuex.Store({
             'Fade': 'Затухание'
         }
         axios.get(process.env.VUE_APP_GET_TABLE)
-        .then(data => {
+        .then(d => {
+            const data = d.data;
             if (data && data.length) {
                 state.activeClass.presentation = []
                 data.forEach((item, index) => {
