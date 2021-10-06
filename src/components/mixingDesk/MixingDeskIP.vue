@@ -66,10 +66,11 @@
       }
     },
     methods: {
-        ...mapActions(['connectOBS']),
+        ...mapActions(['connectOBS', 'postConnectionData']),
         connect() {
             if (this.isValid) {
-                this.connectOBS()
+                this.connectOBS();
+                this.postConnectionData()
             }
         }
     },
